@@ -360,7 +360,8 @@ node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div><
 
 <span class="k">func</span> <span class="f">main</span>() {}</code></pre>
         <div class="steps">
-          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go get github.com/raskell-io/wasm-ad/sdk/tinygo</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Build with the SDK’s TinyGo target, <code>wasm-ad.json</code>: no WASI, data above <code>0x28000</code>, no heap.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>tinygo build -target wasm-ad.json -scheduler=none \
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go mod edit -require=github.com/raskell-io/wasm-ad/sdk/tinygo@v0.1.0
+go mod download github.com/raskell-io/wasm-ad/sdk/tinygo</code></pre><p>Not <code>go get</code>: the SDK only type-checks under TinyGo.</p></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Build with the SDK’s TinyGo target, <code>wasm-ad.json</code> (copy it from the module): no WASI, data above <code>0x28000</code>, no heap.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>tinygo build -target wasm-ad.json -scheduler=none \
   -panic=trap -opt=z -o cart.wasm .
 node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>
           <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/tinygo">The Go SDK’s README</a> has the full setup and API.</p>
