@@ -318,7 +318,7 @@ wasm_ad::<span class="f">cart!</span> { title: <span class="s">"My Cart"</span>,
       </div>
       <div class="code-grid lang-panel" role="tabpanel" id="lang-assemblyscript" aria-labelledby="tab-assemblyscript" hidden>
         <pre class="code"><code><span class="k">import</span> { write16, reg, dispcnt, rgb, setBgColor, setObjColor, objTile,
-         fillTile, frame, oam, sprite, SpriteSize } <span class="k">from</span> <span class="s">"wasm-ad/assembly"</span>;
+         fillTile, frame, oam, sprite, SpriteSize } <span class="k">from</span> <span class="s">"@raskell/wasm-ad/assembly"</span>;
 
 <span class="k">export function</span> <span class="f">start</span>(): <span class="k">void</span> {
   <span class="f">setBgColor</span>(<span class="n">0</span>, <span class="f">rgb</span>(<span class="n">40</span>, <span class="n">60</span>, <span class="n">160</span>));   <span class="c">// backdrop</span>
@@ -332,8 +332,8 @@ wasm_ad::<span class="f">cart!</span> { title: <span class="s">"My Cart"</span>,
   oam.<span class="f">set</span>(<span class="n">0</span>, sprite.<span class="f">make</span>(x, <span class="n">76</span>, SpriteSize.S8x8, <span class="n">0</span>));
 }</code></pre>
         <div class="steps">
-          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>npm install assemblyscript@0.28.20 ./wasm-ad/sdk/assemblyscript</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>The SDK’s <code>asconfig.json</code> sets <code>memoryBase</code>. Keep state in linear memory, not module-level <code>let</code>s: the README shows how.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>npx asc cart.ts --config asconfig.json -o cart.wasm
-node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>npm install @raskell/wasm-ad assemblyscript@0.28</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><pre><code>{ "extends": "./node_modules/@raskell/wasm-ad/cart.asconfig.json" }</code></pre><p>The SDK’s config sets <code>memoryBase</code>. Keep state in linear memory, not module-level <code>let</code>s: the README shows how.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>npx asc cart.ts --config asconfig.json -o cart.wasm
+npx wasmad meta cart.wasm title="My Cart"</code></pre></div></div>
           <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/assemblyscript">The AssemblyScript SDK’s README</a> has the full setup and API.</p>
         </div>
       </div>
