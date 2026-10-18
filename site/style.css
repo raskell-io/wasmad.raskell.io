@@ -169,7 +169,7 @@ h3 { font: 600 17px var(--sans); margin: 0 0 6px; }
 .cart-label img { height: 74%; width: auto; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35)); }
 .twirl-label { background: url("assets/twirl.png") center / cover; image-rendering: pixelated; }
 .hello-label { background: linear-gradient(180deg, #283c9f, #8d5aa0 55%, #ff8c60); }
-.river-label { background: linear-gradient(180deg, rgba(12, 10, 24, 0.1), rgba(12, 10, 24, 0.35)), url("assets/hero.png") center 65% / cover; }
+.river-label { background: linear-gradient(180deg, rgba(12, 10, 24, 0.1), rgba(12, 10, 24, 0.35)), url("assets/rainbow-river.png") center 65% / cover; }
 .own-label { background: repeating-linear-gradient(45deg, #1d1840 0 10px, #221c4b 10px 20px); font: 700 44px var(--display); color: var(--dim); border: 2px dashed var(--line); }
 .cart.own input { display: none; }
 .cart.own.dragging { border-color: var(--cyan); }
