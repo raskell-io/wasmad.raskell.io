@@ -1,0 +1,20 @@
+# mise configuration for wasmad.raskell.io
+# https://mise.jdx.dev
+
+[tasks.build]
+description = "Build the website into dist/"
+run = "scripts/build.sh dist"
+
+[tasks.serve]
+description = "Build the site and serve it on http://127.0.0.1:8644"
+depends = ["build"]
+run = "python3 -m http.server 8644 --directory dist"
+
+[tasks.preview]
+description = "Build the site and serve it like Cloudflare Pages does"
+depends = ["build"]
+run = "npx --yes wrangler@4 pages dev dist"
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = "rm -rf dist"
