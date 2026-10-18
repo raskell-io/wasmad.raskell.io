@@ -29,11 +29,11 @@
   <header class="hero" id="top">
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="hero-copy">
-      <p class="eyebrow">Fantasy console · Spec v0.1</p>
+      <p class="eyebrow">Fantasy console · Spec v0.2</p>
       <h1>The handheld that never shipped. <span class="soft">Carts are WebAssembly.</span></h1>
       <p class="lede">
         WASM-AD is an open standard for a 240×160 console with Game Boy Advance–style hardware.
-        A cart is one <code>.wasm</code> file that draws by writing registers and video memory,
+        A cart is one <code>.wasm</code> file that draws and plays sound by writing registers and memory,
         in any language that compiles to WebAssembly.
       </p>
       <div class="ctas">
@@ -160,7 +160,7 @@
   <div class="separator" aria-hidden="true"></div>
   <div class="status">
     <p class="now-playing" id="now-playing">Booting…</p>
-    <p class="keys"><kbd>←↑↓→</kbd> D-pad <kbd>X</kbd> A <kbd>Z</kbd> B <kbd>A</kbd>/<kbd>S</kbd> L/R <kbd>Enter</kbd> Start · gamepads and touch work too</p>
+    <p class="keys"><kbd>←↑↓→</kbd> D-pad <kbd>X</kbd> A <kbd>Z</kbd> B <kbd>A</kbd>/<kbd>S</kbd> L/R <kbd>Enter</kbd> Start · gamepads and touch work too · <button class="sound-toggle" id="sound" aria-pressed="true">Sound on</button></p>
   </div>
 
   <main>
@@ -168,7 +168,7 @@
       <div class="section-head">
         <p class="eyebrow">Cart slot</p>
         <h2>Insert a cart</h2>
-        <p>Every cart below is a plain WebAssembly module running on the reference renderer, right in this page.</p>
+        <p>Every cart below is a plain WebAssembly module running on the reference core, right in this page.</p>
       </div>
       <div class="carts">
         <button class="cart" data-cart="carts/twirl.wasm">
@@ -180,6 +180,11 @@
           <span class="cart-label hello-label"><img src="assets/cartridge.png" alt=""></span>
           <span class="cart-title">Hello WASM-AD</span>
           <span class="cart-meta">Raster gradient · blending · affine sprite · mosaic</span>
+        </button>
+        <button class="cart" data-cart="carts/starter.wasm">
+          <span class="cart-label starter-label"></span>
+          <span class="cart-title">Starter</span>
+          <span class="cart-meta">Rotating background · a tune on all six sound channels · the same in every SDK</span>
         </button>
         <button class="cart" data-cart="carts/rainbow-river.wasm">
           <span class="cart-label river-label"><img src="assets/trout.png" alt=""></span>
@@ -204,9 +209,9 @@
       <div class="specs">
         <div class="spec"><b>240×160</b><span>pixels at 60 frames per second</span></div>
         <div class="spec"><b>32,768</b><span>colors, RGB555, in 16+16 palette banks</span></div>
-        <div class="spec"><b>4</b><span>scrolling tile layers, or a bitmap mode</span></div>
-        <div class="spec"><b>128</b><span>sprites, 8×8 up to 64×64</span></div>
-        <div class="spec"><b>32</b><span>affine matrices for rotation and scaling</span></div>
+        <div class="spec"><b>4</b><span>tile layers, two that rotate and scale, or a bitmap mode</span></div>
+        <div class="spec"><b>128</b><span>sprites, 8×8 up to 64×64, with 32 rotation matrices</span></div>
+        <div class="spec"><b>6</b><span>sound channels: square, wave, noise and 8-bit samples</span></div>
         <div class="spec"><b>α</b><span>alpha blending, fades, windows, mosaic</span></div>
         <div class="spec"><b>160</b><span>scanline callbacks per frame for raster effects</span></div>
         <div class="spec"><b>32 KB</b><span>battery-backed save RAM</span></div>
@@ -230,7 +235,7 @@
         <div class="seg oam"><b>0x00C00</b><span>OAM · sprites</span></div>
         <div class="seg vram"><b>0x01000</b><span>VRAM · 96 KB of tiles, maps and bitmaps</span></div>
         <div class="seg save"><b>0x19000</b><span>save RAM</span></div>
-        <div class="seg audio"><b>0x21000</b><span>audio (0.2)</span></div>
+        <div class="seg audio"><b>0x21000</b><span>sample RAM</span></div>
         <div class="seg free"><b>0x28000</b><span>your cart's code, data, stack, heap →</span></div>
       </div>
       <div class="why">
@@ -360,7 +365,7 @@ npx wasmad meta cart.wasm title="My Cart"</code></pre></div></div>
 
 <span class="k">func</span> <span class="f">main</span>() {}</code></pre>
         <div class="steps">
-          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go mod edit -require=github.com/raskell-io/wasm-ad/sdk/tinygo@v0.1.0
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go mod edit -require=github.com/raskell-io/wasm-ad/sdk/tinygo@v0.2.0
 go mod download github.com/raskell-io/wasm-ad/sdk/tinygo</code></pre><p>Not <code>go get</code>: the SDK only type-checks under TinyGo.</p></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Build with the SDK’s TinyGo target, <code>wasm-ad.json</code> (copy it from the module): no WASI, data above <code>0x28000</code>, no heap.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>tinygo build -target wasm-ad.json -scheduler=none \
   -panic=trap -opt=z -o cart.wasm .
 node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>

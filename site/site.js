@@ -111,5 +111,13 @@ for (const [type, on] of [['keydown', true], ['keyup', false]]) {
 
 $('#engage').addEventListener('click', () => engage(true));
 
+// Sound starts with the first click or key press (browser autoplay rules).
+$('#sound').addEventListener('click', (e) => {
+  const on = ad.volume === 0;
+  ad.volume = on ? 1 : 0;
+  e.currentTarget.textContent = on ? 'Sound on' : 'Sound off';
+  e.currentTarget.setAttribute('aria-pressed', String(on));
+});
+
 // Attract mode: boot Twirl; its stick spins safely in the start room until played.
 await loadUrl('carts/twirl.wasm', $('.cart[data-cart="carts/twirl.wasm"]'));
