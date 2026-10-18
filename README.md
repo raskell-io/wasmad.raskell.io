@@ -33,4 +33,4 @@ Cloudflare Pages builds `main` with `scripts/cf-pages-build.sh` and serves `dist
 
 ## License
 
-MIT
+MIT. Pixel art made with [PixelLab](https://www.pixellab.ai). WASM-AD is not affiliated with Nintendo.
