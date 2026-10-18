@@ -243,3 +243,18 @@ pre code { color: #d9d5f5; }
   html { scroll-behavior: auto; }
   .cart, .btn, .dock { transition: none; }
 }
+
+/* ---- Get started: language tabs ------------------------------------------ */
+
+.lang-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.lang-tab {
+  padding: 8px 16px; font: 600 14px var(--sans); color: var(--muted); cursor: pointer;
+  background: var(--ink-2); border: 2px solid var(--line); border-radius: 6px; box-shadow: 0 3px 0 #000;
+}
+.lang-tab:hover { color: var(--fg); border-color: var(--violet); }
+.lang-tab[aria-selected="true"] { color: #0c0a18; background: var(--violet); border-color: var(--violet-2); }
+.lang-tab:focus-visible { outline: 2px solid var(--violet-2); outline-offset: 2px; }
+.lang-panel[hidden] { display: none; }
+.step pre { overflow-x: auto; }
+.lang-more { margin: 0; color: var(--muted); font-size: 15px; }
+.start-links { margin: 28px 0 14px; }

@@ -244,10 +244,11 @@
     <section class="section" id="start">
       <div class="section-head">
         <p class="eyebrow">Get started</p>
-        <h2>A cart in twenty lines</h2>
-        <p>The Rust SDK wraps the registers in typed helpers and emulates the hardware natively, so cart logic is testable with plain <code>cargo test</code>.</p>
+        <h2>A cart in twenty lines, in your language</h2>
+        <p>SDKs for Rust, C and C++, Zig, AssemblyScript and Go wrap the registers under the spec’s names. Each ships the same starter cart, and all of them render it identically, frame for frame.</p>
       </div>
-      <div class="code-grid">
+      <div class="lang-tabs" role="tablist" aria-label="Language"><button class="lang-tab" role="tab" id="tab-rust" aria-controls="lang-rust" aria-selected="true">Rust</button><button class="lang-tab" role="tab" id="tab-c" aria-controls="lang-c" aria-selected="false" tabindex="-1">C / C++</button><button class="lang-tab" role="tab" id="tab-zig" aria-controls="lang-zig" aria-selected="false" tabindex="-1">Zig</button><button class="lang-tab" role="tab" id="tab-assemblyscript" aria-controls="lang-assemblyscript" aria-selected="false" tabindex="-1">AssemblyScript</button><button class="lang-tab" role="tab" id="tab-go" aria-controls="lang-go" aria-selected="false" tabindex="-1">Go</button></div>
+      <div class="code-grid lang-panel" role="tabpanel" id="lang-rust" aria-labelledby="tab-rust">
         <pre class="code"><code><span class="k">use</span> wasm_ad::*;
 
 wasm_ad::<span class="f">cart!</span> { title: <span class="s">"My Cart"</span>, author: <span class="s">"me"</span> }
@@ -266,16 +267,111 @@ wasm_ad::<span class="f">cart!</span> { title: <span class="s">"My Cart"</span>,
     oam::<span class="f">set</span>(<span class="n">0</span>, Sprite::<span class="f">new</span>(x, <span class="n">76</span>, SpriteSize::S8x8, <span class="n">0</span>));
 }</code></pre>
         <div class="steps">
-          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>wasm-ad = { git = "https://github.com/raskell-io/wasm-ad" }</code></pre></div></div>
-          <div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Two linker flags put your data and stack above <code>0x28000</code>. The README has the <code>.cargo/config.toml</code>.</p></div></div>
-          <div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>cargo build --release --target wasm32-unknown-unknown</code></pre><p>Drop the <code>.wasm</code> into the cart slot above.</p></div></div>
-          <div class="links">
-            <a class="btn primary" href="spec.html">Read the spec</a>
-            <a class="btn" href="https://github.com/raskell-io/wasm-ad">SDK &amp; examples</a>
-            <a class="btn" href="play/">Standalone player</a>
-          </div>
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>wasm-ad = { git = "https://github.com/raskell-io/wasm-ad" }</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Three linker flags put your data and stack above <code>0x28000</code>. The README has the <code>.cargo/config.toml</code>.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>cargo build --release --target wasm32-unknown-unknown</code></pre><p>Off wasm32 the SDK emulates the hardware, so cart logic is testable with <code>cargo test</code>.</p></div></div>
+          <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/rust">The Rust SDK’s README</a> has the full setup and API.</p>
         </div>
       </div>
+      <div class="code-grid lang-panel" role="tabpanel" id="lang-c" aria-labelledby="tab-c" hidden>
+        <pre class="code"><code><span class="a">#include</span> <span class="s">"wasm_ad.h"</span>
+
+<span class="f">WAD_CART</span>(<span class="f">WAD_TITLE</span>(<span class="s">"My Cart"</span>) <span class="f">WAD_AUTHOR</span>(<span class="s">"me"</span>));
+
+<span class="f">WAD_EXPORT</span>(start) <span class="k">void</span> <span class="f">start</span>(<span class="k">void</span>) {
+    wad_bg_palette[<span class="n">0</span>] = <span class="f">wad_rgb</span>(<span class="n">40</span>, <span class="n">60</span>, <span class="n">160</span>);  <span class="c">/* backdrop */</span>
+    wad_obj_palette[<span class="n">1</span>] = <span class="f">wad_rgb</span>(<span class="n">255</span>, <span class="n">216</span>, <span class="n">64</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; <span class="n">32</span>; i++) wad_obj_tiles[<span class="n">0</span>][i] = <span class="n">0x11</span>;
+    WAD_DISPCNT = WAD_MODE0 | WAD_DISP_OBJ | WAD_OBJ_1D;
+}
+
+<span class="f">WAD_EXPORT</span>(update) <span class="k">void</span> <span class="f">update</span>(<span class="k">void</span>) {
+    <span class="k">int32_t</span> x = (<span class="k">int32_t</span>)(<span class="f">wad_frame</span>() % <span class="n">240</span>);
+    <span class="f">wad_oam_set</span>(<span class="n">0</span>, <span class="f">wad_sprite_new</span>(x, <span class="n">76</span>, WAD_S8x8, <span class="n">0</span>));
+}</code></pre>
+        <div class="steps">
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><p>One header, <code>sdk/c/wasm_ad.h</code>: no library, no libc. It compiles as C11 and C++17.</p></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><pre><code>-Wl,--global-base=163840 -Wl,-z,stack-size=65536</code></pre><p><code>WAD_CART</code> writes the metadata section itself.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>clang --target=wasm32 -O2 -nostdlib -Wl,--no-entry \
+  -Wl,--global-base=163840 cart.c -o cart.wasm</code></pre><p>Needs clang with the WebAssembly backend and wasm-ld; on macOS, Homebrew’s <code>llvm</code> and <code>lld</code>.</p></div></div>
+          <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/c">The C / C++ SDK’s README</a> has the full setup and API.</p>
+        </div>
+      </div>
+      <div class="code-grid lang-panel" role="tabpanel" id="lang-zig" aria-labelledby="tab-zig" hidden>
+        <pre class="code"><code><span class="k">const</span> ad = <span class="f">@import</span>(<span class="s">"wasm_ad"</span>);
+
+<span class="k">comptime</span> {
+    ad.<span class="f">cart</span>(.{ .title = <span class="s">"My Cart"</span>, .author = <span class="s">"me"</span> });
+}
+
+<span class="k">export fn</span> <span class="f">start</span>() <span class="k">void</span> {
+    ad.<span class="f">bgPalette</span>()[<span class="n">0</span>] = ad.<span class="f">rgb</span>(<span class="n">40</span>, <span class="n">60</span>, <span class="n">160</span>); <span class="c">// backdrop</span>
+    ad.<span class="f">objPalette</span>()[<span class="n">1</span>] = ad.<span class="f">rgb</span>(<span class="n">255</span>, <span class="n">216</span>, <span class="n">64</span>);
+    ad.<span class="f">objTiles</span>()[<span class="n">0</span>] = <span class="f">@splat</span>(<span class="n">0x11</span>); <span class="c">// a solid 8×8 tile</span>
+    ad.reg.DISPCNT.<span class="f">write</span>(ad.dispcnt.MODE0 | ad.dispcnt.OBJ | ad.dispcnt.OBJ_1D);
+}
+
+<span class="k">export fn</span> <span class="f">update</span>() <span class="k">void</span> {
+    <span class="k">const</span> x: <span class="k">i32</span> = <span class="f">@intCast</span>(ad.<span class="f">frame</span>() % <span class="n">240</span>);
+    ad.oam.<span class="f">set</span>(<span class="n">0</span>, ad.Sprite.<span class="f">init</span>(x, <span class="n">76</span>, .s8x8, <span class="n">0</span>));
+}</code></pre>
+        <div class="steps">
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>.wasm_ad = .{ .path = "../wasm-ad/sdk/zig" },</code></pre><p>A path dependency in <code>build.zig.zon</code>, to a checkout or submodule.</p></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>The SDK’s <code>addCart</code> build helper sets the target, data base, stack and memory size.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>zig build</code></pre></div></div>
+          <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/zig">The Zig SDK’s README</a> has the full setup and API.</p>
+        </div>
+      </div>
+      <div class="code-grid lang-panel" role="tabpanel" id="lang-assemblyscript" aria-labelledby="tab-assemblyscript" hidden>
+        <pre class="code"><code><span class="k">import</span> { write16, reg, dispcnt, rgb, setBgColor, setObjColor, objTile,
+         fillTile, frame, oam, sprite, SpriteSize } <span class="k">from</span> <span class="s">"wasm-ad/assembly"</span>;
+
+<span class="k">export function</span> <span class="f">start</span>(): <span class="k">void</span> {
+  <span class="f">setBgColor</span>(<span class="n">0</span>, <span class="f">rgb</span>(<span class="n">40</span>, <span class="n">60</span>, <span class="n">160</span>));   <span class="c">// backdrop</span>
+  <span class="f">setObjColor</span>(<span class="n">1</span>, <span class="f">rgb</span>(<span class="n">255</span>, <span class="n">216</span>, <span class="n">64</span>));
+  <span class="f">fillTile</span>(<span class="f">objTile</span>(<span class="n">0</span>), <span class="n">0x11</span>);        <span class="c">// a solid 8×8 tile</span>
+  <span class="f">write16</span>(reg.DISPCNT, dispcnt.MODE0 | dispcnt.OBJ | dispcnt.OBJ_1D);
+}
+
+<span class="k">export function</span> <span class="f">update</span>(): <span class="k">void</span> {
+  <span class="k">const</span> x = &lt;<span class="k">i32</span>&gt;(<span class="f">frame</span>() % <span class="n">240</span>);
+  oam.<span class="f">set</span>(<span class="n">0</span>, sprite.<span class="f">make</span>(x, <span class="n">76</span>, SpriteSize.S8x8, <span class="n">0</span>));
+}</code></pre>
+        <div class="steps">
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>npm install assemblyscript@0.28.20 ./wasm-ad/sdk/assemblyscript</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>The SDK’s <code>asconfig.json</code> sets <code>memoryBase</code>. Keep state in linear memory, not module-level <code>let</code>s: the README shows how.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>npx asc cart.ts --config asconfig.json -o cart.wasm
+node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>
+          <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/assemblyscript">The AssemblyScript SDK’s README</a> has the full setup and API.</p>
+        </div>
+      </div>
+      <div class="code-grid lang-panel" role="tabpanel" id="lang-go" aria-labelledby="tab-go" hidden>
+        <pre class="code"><code><span class="k">package</span> main
+
+<span class="k">import</span> ad <span class="s">"github.com/raskell-io/wasm-ad/sdk/tinygo"</span>
+
+<span class="a">//export start</span>
+<span class="k">func</span> <span class="f">start</span>() {
+	ad.<span class="f">BGPalette</span>()[<span class="n">0</span>] = ad.<span class="f">RGB</span>(<span class="n">40</span>, <span class="n">60</span>, <span class="n">160</span>) <span class="c">// backdrop</span>
+	ad.<span class="f">ObjPalette</span>()[<span class="n">1</span>] = ad.<span class="f">RGB</span>(<span class="n">255</span>, <span class="n">216</span>, <span class="n">64</span>)
+	<span class="k">for</span> i := <span class="k">range</span> ad.<span class="f">ObjTiles</span>()[<span class="n">0</span>] {
+		ad.<span class="f">ObjTiles</span>()[<span class="n">0</span>][i] = <span class="n">0x11</span> <span class="c">// a solid 8×8 tile</span>
+	}
+	ad.DISPCNT.<span class="f">Write</span>(ad.Mode0 | ad.DispObj | ad.Obj1D)
+}
+
+<span class="a">//export update</span>
+<span class="k">func</span> <span class="f">update</span>() {
+	x := <span class="k">int32</span>(ad.<span class="f">Frame</span>() % <span class="n">240</span>)
+	ad.<span class="f">OAMSet</span>(<span class="n">0</span>, ad.<span class="f">NewSprite</span>(x, <span class="n">76</span>, ad.S8x8, <span class="n">0</span>))
+}
+
+<span class="k">func</span> <span class="f">main</span>() {}</code></pre>
+        <div class="steps">
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go get github.com/raskell-io/wasm-ad/sdk/tinygo</code></pre></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Build with the SDK’s TinyGo target, <code>wasm-ad.json</code>: no WASI, data above <code>0x28000</code>, no heap.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>tinygo build -target wasm-ad.json -scheduler=none \
+  -panic=trap -opt=z -o cart.wasm .
+node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>
+          <p class="lang-more"><a href="https://github.com/raskell-io/wasm-ad/tree/main/sdk/tinygo">The Go SDK’s README</a> has the full setup and API.</p>
+        </div>
+      </div>
+      <div class="links start-links">
+        <a class="btn primary" href="spec.html">Read the spec</a>
+        <a class="btn" href="https://github.com/raskell-io/wasm-ad/tree/main/sdk">SDKs &amp; examples</a>
+        <a class="btn" href="play/">Standalone player</a>
+      </div>
+      <p class="lang-more">Any language that compiles to WebAssembly can make a cart without an SDK. <code>node tools/wasmad.mjs check cart.wasm</code> validates one against the spec.</p>
     </section>
   </main>
 
@@ -286,5 +382,27 @@ wasm_ad::<span class="f">cart!</span> { title: <span class="s">"My Cart"</span>,
   </footer>
 
   <script type="module" src="site.js"></script>
+  <script>
+    // Language tabs in Get started; arrow keys move between them.
+    const tabs = [...document.querySelectorAll('.lang-tab')];
+    function select(tab) {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute('aria-selected', on);
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      }
+    }
+    for (const tab of tabs) {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (e) => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        if (!step) return;
+        const next = tabs[(tabs.indexOf(tab) + step + tabs.length) % tabs.length];
+        select(next);
+        next.focus();
+      });
+    }
+  </script>
 </body>
 </html>
