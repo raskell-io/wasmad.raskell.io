@@ -42,6 +42,13 @@ async function load(bytes, button) {
     const meta = await ad.load(bytes);
     document.querySelectorAll('.cart').forEach((c) => c.classList.toggle('active', c === button));
     status(`Now playing: <b>${escape(meta.title)}</b>${meta.author ? ` by ${escape(meta.author)}` : ''}`);
+    // A cart you drop in shows its icon (SPEC.md §2.5) in the slot.
+    if (button?.id === 'own-cart') {
+      const label = button.querySelector('.own-label'), icon = ad.iconURL();
+      label.classList.toggle('has-icon', Boolean(icon));
+      label.style.backgroundImage = icon ? `url("${icon}"), repeating-linear-gradient(45deg, #1d1840 0 10px, #221c4b 10px 20px)` : '';
+      button.querySelector('.cart-title').textContent = meta.title;
+    }
   } catch (e) {
     status(`<span class="err">${escape(e.message)}</span>`);
   }

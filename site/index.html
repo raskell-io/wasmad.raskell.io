@@ -29,7 +29,7 @@
   <header class="hero" id="top">
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="hero-copy">
-      <p class="eyebrow">Fantasy console · Spec v0.2</p>
+      <p class="eyebrow">Fantasy console · Spec v0.3</p>
       <h1>The handheld that never shipped. <span class="soft">Carts are WebAssembly.</span></h1>
       <p class="lede">
         WASM-AD is an open standard for a 240×160 console with Game Boy Advance–style hardware.
@@ -160,7 +160,7 @@
   <div class="separator" aria-hidden="true"></div>
   <div class="status">
     <p class="now-playing" id="now-playing">Booting…</p>
-    <p class="keys"><kbd>←↑↓→</kbd> D-pad <kbd>X</kbd> A <kbd>Z</kbd> B <kbd>A</kbd>/<kbd>S</kbd> L/R <kbd>Enter</kbd> Start · gamepads and touch work too · <button class="sound-toggle" id="sound" aria-pressed="true">Sound on</button></p>
+    <p class="keys"><kbd>←↑↓→</kbd> D-pad <kbd>X</kbd> A <kbd>Z</kbd> B <kbd>A</kbd>/<kbd>S</kbd> L/R <kbd>Enter</kbd> Start <kbd>⌫</kbd> rewind · up to four gamepads, and touch · <button class="sound-toggle" id="sound" aria-pressed="true">Sound on</button></p>
   </div>
 
   <main>
@@ -212,8 +212,8 @@
         <div class="spec"><b>4</b><span>tile layers, two that rotate and scale, or a bitmap mode</span></div>
         <div class="spec"><b>128</b><span>sprites, 8×8 up to 64×64, with 32 rotation matrices</span></div>
         <div class="spec"><b>6</b><span>sound channels: square, wave, noise and 8-bit samples</span></div>
-        <div class="spec"><b>α</b><span>alpha blending, fades, windows, mosaic</span></div>
-        <div class="spec"><b>160</b><span>scanline callbacks per frame for raster effects</span></div>
+        <div class="spec"><b>α</b><span>alpha blending, fades, windows, mosaic, per-line raster effects</span></div>
+        <div class="spec"><b>4</b><span>players, each on a controller of their own</span></div>
         <div class="spec"><b>32 KB</b><span>battery-backed save RAM</span></div>
       </div>
     </section>
@@ -240,7 +240,7 @@
       </div>
       <div class="why">
         <div class="card"><h3>Any language</h3><p>Rust, Zig, C, AssemblyScript, Go: if it compiles to wasm and can write to an address, it can make a cart. No bindings needed.</p></div>
-        <div class="card"><h3>Save states for free</h3><p>All state lives in linear memory. Snapshot it between frames and you have save states, rewind and replays.</p></div>
+        <div class="card"><h3>Save states for free</h3><p>All state lives in linear memory, sound included. Save states and replays are files any host can load, and rewind is a snapshot ring: hold <kbd>⌫</kbd> while playing.</p></div>
         <div class="card"><h3>Deterministic</h3><p>No clock, no random syscalls: one boot seed plus the inputs fully determine a run. Netplay and golden-image tests just work.</p></div>
         <div class="card"><h3>One file</h3><p>Code, art and metadata ship in a single <code>.wasm</code>, at most 32 MiB, like a cartridge. One import: <code>trace</code>.</p></div>
       </div>
@@ -365,7 +365,7 @@ npx wasmad meta cart.wasm title="My Cart"</code></pre></div></div>
 
 <span class="k">func</span> <span class="f">main</span>() {}</code></pre>
         <div class="steps">
-          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go mod edit -require=github.com/raskell-io/wasm-ad/sdk/tinygo@v0.2.0
+          <div class="step"><span>1</span><div><h3>Add the SDK</h3><pre><code>go mod edit -require=github.com/raskell-io/wasm-ad/sdk/tinygo@v0.3.0
 go mod download github.com/raskell-io/wasm-ad/sdk/tinygo</code></pre><p>Not <code>go get</code>: the SDK only type-checks under TinyGo.</p></div></div><div class="step"><span>2</span><div><h3>Keep out of the hardware region</h3><p>Build with the SDK’s TinyGo target, <code>wasm-ad.json</code> (copy it from the module): no WASI, data above <code>0x28000</code>, no heap.</p></div></div><div class="step"><span>3</span><div><h3>Build and play</h3><pre><code>tinygo build -target wasm-ad.json -scheduler=none \
   -panic=trap -opt=z -o cart.wasm .
 node wasm-ad/tools/wasmad.mjs meta cart.wasm title="My Cart"</code></pre></div></div>
